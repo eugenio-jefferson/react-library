@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -54,9 +55,9 @@ export function LoginForm({
           </Button> */}
         <FieldDescription className="text-center">
           Don&apos;t have an account?{" "}
-          <a href="/register" className="underline underline-offset-4">
+          <Link to="/register" className="underline underline-offset-4">
             Sign up
-          </a>
+          </Link>
         </FieldDescription>
         {/* </Field> */}
       </FieldGroup>
