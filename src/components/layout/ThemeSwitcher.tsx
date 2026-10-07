@@ -5,7 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
+import { Computer, Moon, Sun } from "lucide-react";
 import { Button } from "../ui/button";
 
 function ThemeSwitcher() {
@@ -22,12 +22,15 @@ function ThemeSwitcher() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
+          <Sun />
           Light
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <Moon />
           Dark
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
+          <Computer />
           System
         </DropdownMenuItem>
       </DropdownMenuContent>
