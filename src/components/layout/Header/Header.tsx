@@ -1,0 +1,35 @@
+import { Link } from "react-router-dom";
+import styles from "./Header.module.css";
+import ThemeSwitcher from "../ThemeSwitcher";
+import ProfileMenu from "../ProfileMenu";
+
+function Header() {
+  return (
+    <header className={`${styles.site_header}`} id="header">
+      <div className={`${styles.container} ${styles.nav_container}`}>
+        <Link to={"/"} className="text-3xl font-bold hover:text-primary">
+          J's Library
+        </Link>
+
+        <nav
+          className={`${styles.nav} font-bold text-lg`}
+          aria-label="Navigation"
+        >
+          <Link to={"/"} className={styles.nav_link}>
+            Home
+          </Link>
+          <Link to={"/catalog"} className={styles.nav_link}>
+            Catalog
+          </Link>
+        </nav>
+
+        <div className={styles.nav_actions}>
+          <ProfileMenu />
+          <ThemeSwitcher />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default Header;

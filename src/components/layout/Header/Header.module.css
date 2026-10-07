@@ -1,0 +1,47 @@
+.container {
+  width: 100%;
+  padding: 1rem;
+}
+
+.site_header {
+  position: sticky;
+  display: flex;
+  align-items: center;
+}
+
+.nav_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav_link {
+  text-decoration: none;
+}
+
+.nav_link:hover {
+  color: var(--primary);
+}
+
+.brand {
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.nav_actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
