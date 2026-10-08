@@ -18,8 +18,8 @@ function Header() {
           <Link to={"/"} className={styles.nav_link}>
             Home
           </Link>
-          <Link to={"/catalog"} className={styles.nav_link}>
-            Catalog
+          <Link to={"/search"} className={styles.nav_link}>
+            Search
           </Link>
         </nav>
 
