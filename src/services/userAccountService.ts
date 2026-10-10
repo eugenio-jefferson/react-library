@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import type { UserLogin } from "../type/userLogin.ts";
 import type { UserRegistration } from "../type/userRegistration";
 
 class UserAccountService {
@@ -13,6 +14,16 @@ class UserAccountService {
         },
         emailRedirectTo: import.meta.env.VITE_SIGN_UP_REDIRECT_URL
       }
+    })
+
+    if (error) throw error
+    return data
+  }
+
+  async signIn({ email, password }: UserLogin) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
     })
 
     if (error) throw error
