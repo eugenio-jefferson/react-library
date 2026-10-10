@@ -30,6 +30,22 @@ class UserAccountService {
     return data
   }
 
+  async getSession() {
+    const { data, error } = await supabase.auth.getSession()
+    if (error) throw error
+    return data.session
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const session = await this.getSession()
+    return session?.access_token ?? null
+  }
+
+  async getUser() {
+    const { data, error } = await supabase.auth.getUser()
+    if (error) throw error
+    return data.user
+  }
 }
 
 export const userAccountService = new UserAccountService();
