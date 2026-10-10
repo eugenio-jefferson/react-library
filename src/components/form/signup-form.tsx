@@ -9,13 +9,76 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
+import { useUserAccount } from "@/hooks/useUserAccount";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const [createdAccount, setCreatedAccount] = useState(false);
+
+  const {
+    signUp,
+    isSubmittingSignUp,
+    isSuccessSignUp,
+    isErrorSignUp,
+    signUpError,
+  } = useUserAccount();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+
+    if (createdAccount) setCreatedAccount(false);
+  };
+
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      console.log("Passwords do not match");
+      return;
+    }
+
+    signUp({
+      email: formData.email,
+      password: formData.password,
+      name: formData.fullName,
+    });
+  };
+
+  useEffect(() => {
+    const handleCreatedAccount = () => {
+      if (isSuccessSignUp) {
+        setCreatedAccount(true);
+      }
+
+      setFormData({
+        fullName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    };
+
+    handleCreatedAccount();
+  }, [isSuccessSignUp]);
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+      onSubmit={handleSubmit}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>
@@ -30,6 +93,9 @@ export function SignupForm({
             type="text"
             placeholder="John Doe"
             required
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
             className="bg-background"
           />
         </Field>
@@ -40,6 +106,9 @@ export function SignupForm({
             type="email"
             placeholder="m@example.com"
             required
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
             className="bg-background"
           />
           <FieldDescription>
@@ -53,6 +122,9 @@ export function SignupForm({
             id="password"
             type="password"
             required
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
             className="bg-background"
           />
           <FieldDescription>
@@ -65,12 +137,36 @@ export function SignupForm({
             id="confirm-password"
             type="password"
             required
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
             className="bg-background"
           />
           <FieldDescription>Please confirm your password.</FieldDescription>
         </Field>
         <Field>
-          <Button type="submit">Create Account</Button>
+          <Button type="submit" disabled={isSubmittingSignUp || createdAccount}>
+            {isSubmittingSignUp
+              ? "Creating Account..."
+              : createdAccount
+                ? "Check Your Email"
+                : "Create Account"}
+          </Button>
+          {isErrorSignUp && (
+            <FieldDescription className="text-red-500 text-center">
+              {signUpError?.message}
+            </FieldDescription>
+          )}
+          {isSuccessSignUp && (
+            <FieldGroup>
+              <FieldDescription className="text-green-500 text-center font-medium py-2">
+                Account created successfully!
+              </FieldDescription>
+              <FieldDescription className="text-green-500 text-center font-black">
+                Please check your email to verify your account.
+              </FieldDescription>
+            </FieldGroup>
+          )}
         </Field>
         {/* <FieldSeparator>Or continue with</FieldSeparator> */}
         <Field>
