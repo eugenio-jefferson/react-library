@@ -35,6 +35,18 @@ function useUserAccount() {
     }
   })
 
+  const signOutMutation = useMutation({
+    mutationFn: async () => {
+      return await userAccountService.signOut()
+    },
+    onSuccess: (data) => {
+      return data
+    },
+    onError: (error) => {
+      return error
+    }
+  })
+
   return {
     signUp: signUpMutation.mutate,
     isSubmittingSignUp: signUpMutation.isPending,
@@ -42,11 +54,19 @@ function useUserAccount() {
     isErrorSignUp: signUpMutation.isError,
     signUpError: signUpMutation.error,
     signIn: signInMutation.mutate,
-    signInAsync: signInMutation.mutateAsync,
     isSubmittingSignIn: signInMutation.isPending,
     isSuccessSignIn: signInMutation.isSuccess,
     isErrorSignIn: signInMutation.isError,
     signInError: signInMutation.error,
+    signOut: signOutMutation.mutate,
+    signOutAsync: signOutMutation.mutateAsync,
+    isSubmittingSignOut: signOutMutation.isPending,
+    isSuccessSignOut: signOutMutation.isSuccess,
+    isErrorSignOut: signOutMutation.isError,
+    signOutError: signOutMutation.error,
+    getAccessToken: () => userAccountService.getAccessToken(),
+    getSession: () => userAccountService.getSession(),
+    getUser: () => userAccountService.getUser(),
   }
 
 }
