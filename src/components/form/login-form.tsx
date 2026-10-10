@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -9,13 +9,56 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useUserAccount } from "@/hooks/useUserAccount";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const {
+    signIn,
+    isSubmittingSignIn,
+    isErrorSignIn,
+    signInError,
+  } = useUserAccount();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    signIn(
+      {
+        email: formData.email,
+        password: formData.password,
+      },
+      {
+        onSuccess: () => {
+          navigate("/");
+        },
+      }
+    );
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+      onSubmit={handleSubmit}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
@@ -25,7 +68,15 @@ export function LoginForm({
         </div>
         <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="m@example.com"
+            required
+          />
         </Field>
         <Field>
           <div className="flex items-center">
@@ -37,10 +88,20 @@ export function LoginForm({
               Forgot your password?
             </a> */}
           </div>
-          <Input id="password" type="password" required />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            placeholder="Enter your password"
+            onChange={handleChange}
+            required
+          />
         </Field>
         <Field>
-          <Button type="submit">Login</Button>
+          <Button type="submit" disabled={isSubmittingSignIn}>
+            {isSubmittingSignIn ? "Login..." : "Login"}
+          </Button>
         </Field>
         {/* <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
@@ -53,12 +114,17 @@ export function LoginForm({
             </svg>
             Login with GitHub
           </Button> */}
-        <FieldDescription className="text-center">
-          Don&apos;t have an account?{" "}
-          <Link to="/register" className="underline underline-offset-4">
-            Sign up
-          </Link>
-        </FieldDescription>
+        <FieldGroup>
+          <FieldDescription className="text-center text-red-500">
+            {isErrorSignIn ? signInError?.message : ""}
+          </FieldDescription>
+          <FieldDescription className="text-center">
+            Don&apos;t have an account?{" "}
+            <Link to="/register" className="underline underline-offset-4">
+              Sign up
+            </Link>
+          </FieldDescription>
+        </FieldGroup>
         {/* </Field> */}
       </FieldGroup>
     </form>
