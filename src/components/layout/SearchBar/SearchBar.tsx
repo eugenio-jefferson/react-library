@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Field } from "../field";
-import { Input } from "../input";
-import { Button } from "../button";
+import { Field } from "../../ui/field";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 import { Search } from "lucide-react";
 
 export interface SearchBarProps {
