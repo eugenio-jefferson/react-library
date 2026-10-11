@@ -12,7 +12,7 @@ class UserAccountService {
         data: {
           name: name
         },
-        emailRedirectTo: import.meta.env.VITE_SIGN_UP_REDIRECT_URL
+        emailRedirectTo: this.getBaseUrl() + "/login"
       }
     })
 
@@ -50,6 +50,13 @@ class UserAccountService {
   async signOut() {
     const { error } = await supabase.auth.signOut()
     if (error) throw error
+  }
+
+  private getBaseUrl() {
+    if (typeof window !== 'undefined')
+      return window.location.origin
+
+    return import.meta.env.VITE_BASE_URL
   }
 }
 
