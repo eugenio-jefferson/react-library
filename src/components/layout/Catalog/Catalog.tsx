@@ -15,7 +15,7 @@ function Catalog({
   if (isLoading) {
     return (
       <section className="grid grid-cols-2 gap-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {Array.from({ length: skeletonCount }).map((index) => (
+        {Array.from({ length: skeletonCount }).map((_, index) => (
           <BookCardSkeleton key={`skeleton-${index}`} />
         ))}
       </section>
