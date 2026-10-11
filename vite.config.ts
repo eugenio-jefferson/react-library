@@ -11,5 +11,5 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
-  base: process.env.VITE_BASE_PATH || "/react-library",
+  base: process.env.VITE_BASE_PATH || "/",
 })

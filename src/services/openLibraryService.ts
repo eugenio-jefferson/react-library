@@ -167,14 +167,15 @@ export class OpenLibraryService {
         );
       }
     } catch {
-      const searchFallback = await this.searchBooks({
-        query: `subject:${cleanCategory}`,
-        limit,
-        offset: 0,
-      });
-
-      return searchFallback.books;
+      // do nothing, return fallback
     }
+    const searchFallback = await this.searchBooks({
+      query: `subject:${cleanCategory}`,
+      limit,
+      offset: 0,
+    });
+
+    return searchFallback.books;
   }
 
   public async getTrendingBooks(limit = 10): Promise<Book[]> {
@@ -205,15 +206,17 @@ export class OpenLibraryService {
         );
       }
     } catch {
-      const fallbackResult = await this.searchBooks({
-        query: "bestseller",
-        sort: "popularity",
-        limit,
-        offset: 0,
-      });
-
-      return fallbackResult.books;
+      // do nothing, return fallback
     }
+    const fallbackResult = await this.searchBooks({
+      query: "bestseller",
+      sort: "popularity",
+      limit,
+      offset: 0,
+    });
+
+    return fallbackResult.books;
+
   }
 
   public async getHomeCatalog(
