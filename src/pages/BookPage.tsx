@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { useBookDetails } from "@/hooks/useBookDetails";
 import { useState } from "react";

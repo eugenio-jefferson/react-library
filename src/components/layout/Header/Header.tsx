@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import styles from "./Header.module.css";
 import ThemeSwitcher from "../ThemeSwitcher";
 import ProfileMenu from "../ProfileMenu";

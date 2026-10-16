@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -23,12 +23,8 @@ export function LoginForm({
     password: "",
   });
 
-  const {
-    signIn,
-    isSubmittingSignIn,
-    isErrorSignIn,
-    signInError,
-  } = useUserAccount();
+  const { signIn, isSubmittingSignIn, isErrorSignIn, signInError } =
+    useUserAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -49,7 +45,7 @@ export function LoginForm({
         onSuccess: () => {
           navigate("/");
         },
-      }
+      },
     );
   };
 

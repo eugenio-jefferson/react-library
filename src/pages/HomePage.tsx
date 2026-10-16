@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import SearchBar from "../components/layout/SearchBar";
 import Catalog from "@/components/layout/Catalog";
 import { useHomeCatalog } from "@/hooks/useHomeCatalog";
