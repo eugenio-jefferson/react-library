@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardDescription,
@@ -8,15 +9,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface BookCardProps {
+  readonly id?: string;
   readonly title: string;
   readonly author: string;
   readonly cover_image: string;
 }
 
-export function BookCard({ title, author, cover_image }: BookCardProps) {
+export function BookCard({ id, title, author, cover_image }: BookCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  return (
+  const card = (
     <Card className="relative mx-auto w-full max-w-3xs pt-0 overflow-hidden shadow-xs">
       <div className="relative aspect-2/3 w-full bg-muted/60 overflow-hidden">
         {!imageLoaded && (
@@ -40,6 +42,17 @@ export function BookCard({ title, author, cover_image }: BookCardProps) {
         </CardDescription>
       </CardHeader>
     </Card>
+  );
+
+  if (!id) return card;
+
+  return (
+    <Link
+      to={`/books/${id}`}
+      className="transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-ring/50"
+    >
+      {card}
+    </Link>
   );
 }
 
