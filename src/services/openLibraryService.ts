@@ -1,6 +1,7 @@
-import type { OpenLibraryDoc, OpenLibrarySearchResponse, OpenLibraryServiceConfig, OpenLibrarySubjectResponse, OpenLibrarySubjectWork, OpenLibraryTrendingResponse } from "@/type/openLibrary";
+import type { OpenLibraryAuthorResponse, OpenLibraryDoc, OpenLibrarySearchResponse, OpenLibraryServiceConfig, OpenLibrarySubjectResponse, OpenLibrarySubjectWork, OpenLibraryTrendingResponse, OpenLibraryWorkDescription, OpenLibraryWorkResponse } from "@/type/openLibrary";
 import type {
   Book,
+  BookDetails,
   BookSearchParams,
   BookSearchResult,
   BookSortOption,
@@ -219,6 +220,44 @@ export class OpenLibraryService {
 
   }
 
+  public async getBookDetails(workId: string): Promise<BookDetails> {
+    const normalizedId = this.normalizeWorkId(workId);
+    const workUrl = `${this.baseUrl}/works/${encodeURIComponent(
+      normalizedId
+    )}.json`;
+
+    const work = await this.rateLimiter.schedule(
+      async () => {
+        const res = await this.fetcher(workUrl, {
+          headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+          throw new Error(
+            `Error fetching book details on Open Library (${res.status}: ${res.statusText})`
+          );
+        }
+
+        return (await res.json()) as OpenLibraryWorkResponse;
+      },
+      `work_${normalizedId}`
+    );
+
+    const author = await this.resolveWorkAuthor(work);
+
+    return {
+      id: normalizedId,
+      key: work.key || `/works/${normalizedId}`,
+      title: work.title?.trim() || "Untitled",
+      author,
+      category: work.subjects?.[0] || "General",
+      description: this.parseDescription(work.description),
+      cover_image: this.formatCoverUrl(work.covers?.[0], "L"),
+      subjects: work.subjects || [],
+      publish_date: work.publish_date,
+    };
+  }
+
   public async getHomeCatalog(
     categories: CategoryDefinition[] = DEFAULT_CATEGORIES,
     limitPerCategory = 10
@@ -268,6 +307,64 @@ export class OpenLibraryService {
 
   public clearCache(): void {
     this.rateLimiter.clearCache();
+  }
+
+  private normalizeWorkId(workId: string): string {
+    const trimmed = decodeURIComponent(workId).trim();
+    return trimmed.replace(/^\/?works\//, "");
+  }
+
+  private parseDescription(
+    description: string | OpenLibraryWorkDescription | undefined
+  ): string {
+    if (!description) return "";
+    if (typeof description === "string") return description.trim();
+    return (description.value || "").trim();
+  }
+
+  private async resolveWorkAuthor(
+    work: OpenLibraryWorkResponse
+  ): Promise<string> {
+    const names = await Promise.all(
+      (work.authors || []).map(async (entry) => {
+        if (entry.author?.name) return entry.author.name;
+        if (!entry.author?.key) return null;
+
+        const authorKey = entry.author.key.replace("/authors/", "");
+        const authorUrl = `${this.baseUrl}/authors/${encodeURIComponent(
+          authorKey
+        )}.json`;
+
+        try {
+          const author = await this.rateLimiter.schedule(
+            async () => {
+              const res = await this.fetcher(authorUrl, {
+                headers: { Accept: "application/json" },
+              });
+
+              if (!res.ok) {
+                throw new Error(
+                  `Error fetching author on Open Library (${res.status})`
+                );
+              }
+
+              return (await res.json()) as OpenLibraryAuthorResponse;
+            },
+            `author_${authorKey}`
+          );
+
+          return author.name?.trim() || null;
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    const validNames = names.filter(
+      (name): name is string => Boolean(name && name.trim())
+    );
+
+    return validNames.length > 0 ? validNames.join(", ") : "Unknown Author";
   }
 
   private buildSearchUrl(
