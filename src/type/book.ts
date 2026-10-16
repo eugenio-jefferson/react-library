@@ -58,3 +58,15 @@ export interface HomeCatalogData {
   trending: Book[];
   categories: CategoryBooks[];
 }
+
+export interface BookDetails {
+  id: string;
+  key: string;
+  title: string;
+  author: string;
+  category: string;
+  description: string;
+  cover_image: string;
+  subjects: string[];
+  publish_date?: string;
+}
