@@ -37,7 +37,7 @@ export function useBookDetails(
   });
 
   return {
-    book: data,
+    book: data as BookDetails,
     isLoading,
     isFetching,
     isError,

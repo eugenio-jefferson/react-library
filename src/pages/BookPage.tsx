@@ -1,10 +1,22 @@
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookBookmarkIcon, BookUp } from "lucide-react";
 import { useBookDetails } from "@/hooks/useBookDetails";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useAuthSession } from "@/hooks/useAuthSession";
+import BorrowBookDialog from "@/components/loan/BorrowBookDialog";
+import { useBookLoanInfo } from "@/hooks/useBookLoanInfo";
+import { formatLoanDate, isOverdue } from "@/components/loan/loanDates";
+import LoanBadge, { type LoanBadgeState } from "@/components/loan/LoanBadge";
+import ReturnBookDialog from "@/components/loan/ReturnBookDialog";
 
 function BookPageSkeleton() {
   return (
@@ -56,21 +68,59 @@ export default function BookPage() {
   const navigate = useNavigate();
 
   const { id } = useParams<{ id: string }>();
-  const { book, isLoading, isError, error, refetch } = useBookDetails(id);
+  const {
+    book,
+    isLoading: isBookLoading,
+    isError: isBookError,
+    error: bookError,
+    refetch,
+  } = useBookDetails(id);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuthSession();
+  const {
+    info,
+    isLoading: isLoanInfoLoading,
+    isError: isLoanInfoError,
+  } = useBookLoanInfo(book?.id, user?.id);
+
+  const activeLoan = info?.activeLoan ?? null;
+  const overdue = activeLoan ? isOverdue(activeLoan.due_date) : false;
+  const unavailable =
+    activeLoan &&
+    info != null &&
+    info.availableCopies !== null &&
+    info.availableCopies <= 0;
+  const [borrowOpen, setBorrowOpen] = useState(false);
+  const [returnOpen, setReturnOpen] = useState(false);
 
   const goBack = () => {
     navigate(-1);
   };
 
-  if (isLoading) return <BookPageSkeleton />;
+  const handleBorrowClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+    setBorrowOpen(true);
+  };
+
+  const badgeState = (): LoanBadgeState => {
+    if (activeLoan) return overdue ? "overdue" : "borrowed";
+    if (unavailable) return "unavailable";
+    return "available";
+  };
+
+  if (isBookLoading || isAuthLoading || isLoanInfoLoading)
+    return <BookPageSkeleton />;
 
   const renderContent = () => {
-    if (isError) {
+    if (isBookError || isLoanInfoError) {
       return (
         <Card className="flex flex-col items-center justify-center border border-destructive/30 bg-destructive/10 p-8 text-center text-destructive">
           <p className="text-sm font-medium">
-            {error?.message ||
+            {bookError?.message ||
               "An error occurred while loading this book data."}
           </p>
           <Button
@@ -112,13 +162,67 @@ export default function BookPage() {
               className={`aspect-2/3 max-w-2/3 shrink-0 rounded-lg md:w-64 ${imageLoaded ? "visible" : "invisible"}`}
             />
           </CardHeader>
-          <CardContent className="flex w-full flex-col gap-4 pl-15 pr-15 pb-7 items-center">
-            <h1 className="font-bold text-2xl">{book.title}</h1>
-            <p className="text-base font-medium">{book.author}</p>
-            <p className="text-base font-medium text-muted-foreground">
+          <CardContent className="flex w-full flex-col gap-4 pl-15 pr-15 items-center">
+            <h1 className="font-bold text-2xl text-center">{book.title}</h1>
+            <p className="text-base font-medium text-center">{book.author}</p>
+            <p className="text-base font-medium text-center text-muted-foreground">
               {book.publish_date}
             </p>
+            <LoanBadge state={badgeState()} className="text-md" />
+            {activeLoan ? (
+              <p className="text-sm text-muted-foreground">
+                Return on{" "}
+                <span
+                  className={
+                    overdue
+                      ? "font-semibold text-destructive"
+                      : "font-medium text-foreground"
+                  }
+                >
+                  {formatLoanDate(activeLoan.due_date)}
+                </span>
+              </p>
+            ) : (
+              <></>
+            )}
           </CardContent>
+          <CardFooter className="flex w-full justify-center pt-8 pb-8">
+            {!activeLoan ? (
+              <Button
+                size="lg"
+                onClick={handleBorrowClick}
+                disabled={unavailable}
+                className="cursor-pointer w-60 h-10 text-xl"
+              >
+                <BookBookmarkIcon className="size-6" />
+                <span className="pl-3">Borrow this book</span>
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                onClick={() => setReturnOpen(true)}
+                className="cursor-pointer w-60 h-10 text-xl"
+                variant="secondary"
+              >
+                <BookUp className="size-6" />
+                <span className="pl-3">Return this book</span>
+              </Button>
+            )}
+            {activeLoan ? (
+              <ReturnBookDialog
+                loan={activeLoan}
+                bookTitle={book.title}
+                open={returnOpen}
+                onOpenChange={setReturnOpen}
+              />
+            ) : (
+              <BorrowBookDialog
+                book={book}
+                open={borrowOpen}
+                onOpenChange={setBorrowOpen}
+              />
+            )}
+          </CardFooter>
         </Card>
         <Card className="flex w-full flex-col gap-4 items-center border border-muted-foreground/30 shadow-lg pt-10 pb-10 pr-4 pl-4">
           <CardTitle className="flex w-full justify-center">
