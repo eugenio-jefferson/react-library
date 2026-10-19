@@ -10,7 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { LogInIcon, LogOut, User, UserRoundArrowLeft } from "lucide-react";
+import {
+  LibraryBig,
+  LogInIcon,
+  LogOut,
+  User,
+  UserRoundArrowLeft,
+} from "lucide-react";
 import { useUserAccount } from "@/hooks/useUserAccount";
 import { supabase } from "@/services/supabaseClient";
 import type { Session } from "@supabase/supabase-js";
@@ -60,6 +66,14 @@ function ProfileMenu() {
                 {session.user.email}
               </DropdownMenuItem>
             </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => navigate("/loans")}
+              className="cursor-pointer"
+            >
+              <LibraryBig className="mr-2 h-4 w-4" />
+              My Loans
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleLogout}

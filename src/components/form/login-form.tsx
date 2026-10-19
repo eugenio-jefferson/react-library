@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { cn } from "cn";
 
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -43,7 +44,8 @@ export function LoginForm({
       },
       {
         onSuccess: () => {
-          navigate("/");
+          const from = (location.state as { from?: string } | null)?.from;
+          navigate(from ?? "/", { replace: true });
         },
       },
     );
