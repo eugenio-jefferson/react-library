@@ -1,10 +1,11 @@
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router";
 import SearchBar from "../components/layout/SearchBar";
 import Catalog from "@/components/layout/Catalog";
 import SearchControlsBar from "@/components/layout/SearchControlsBar";
 import { useBookSearch } from "@/hooks/useBookSearch";
 import { Button } from "@/components/ui/button";
+import { sanitizeSearchQuery } from "@/utils/sanitize";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function SearchPage() {
@@ -38,16 +39,21 @@ function SearchPage() {
     debounceMs: 400,
   });
 
+  const lastUrlQueryRef = useRef(urlQuery);
   useEffect(() => {
-    if (urlQuery && urlQuery !== query) {
-      setQuery(urlQuery);
+    if (urlQuery !== lastUrlQueryRef.current) {
+      lastUrlQueryRef.current = urlQuery;
+      if (urlQuery) {
+        setQuery(urlQuery);
+      }
     }
-  }, [urlQuery, query, setQuery]);
+  }, [urlQuery, setQuery]);
 
   const handleSearchSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (query) {
-      setSearchParams({ q: query });
+    const cleanQuery = sanitizeSearchQuery(query);
+    if (cleanQuery) {
+      setSearchParams({ q: cleanQuery });
     }
   };
 
@@ -95,7 +101,7 @@ function SearchPage() {
   };
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-8 bg-muted p-6 md:p-10">
+    <article className="flex min-h-[calc(100svh-15rem)] flex-col items-center justify-start gap-8 bg-muted p-6 md:p-10">
       <section className="flex w-full max-w-4xl flex-col items-center gap-4 text-center">
         <div className="w-full max-w-lg">
           <SearchBar

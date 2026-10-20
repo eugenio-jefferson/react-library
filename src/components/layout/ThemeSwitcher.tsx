@@ -7,9 +7,13 @@ import {
 } from "../ui/dropdown-menu";
 import { Computer, Moon, Sun } from "lucide-react";
 import { Button } from "../ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 function ThemeSwitcher() {
   const { setTheme } = useTheme();
+  const isMobile = useIsMobile();
+
+  if (isMobile) return null;
 
   return (
     <DropdownMenu>

@@ -47,3 +47,41 @@ export interface OpenLibraryTrendingResponse {
   works?: OpenLibrarySubjectWork[];
   docs?: OpenLibraryDoc[];
 }
+
+export interface OpenLibraryWorkDescription {
+  type?: string;
+  value?: string;
+}
+
+export interface OpenLibraryWorkAuthorRef {
+  author?: {
+    key?: string;
+    name?: string;
+  };
+}
+
+export interface OpenLibraryWorkResponse {
+  key?: string;
+  title?: string;
+  description?: string | OpenLibraryWorkDescription;
+  covers?: number[];
+  subjects?: string[];
+  authors?: OpenLibraryWorkAuthorRef[];
+  publish_date?: string;
+}
+
+export interface OpenLibraryAuthorResponse {
+  key?: string;
+  name?: string;
+}
+
+export interface OpenLibraryEdition {
+  key?: string;
+  title?: string;
+  ocaid?: string;
+}
+
+export interface OpenLibraryEditionsResponse {
+  key?: string;
+  entries?: OpenLibraryEdition[];
+}

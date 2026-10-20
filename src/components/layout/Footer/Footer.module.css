@@ -1,0 +1,19 @@
+.site_footer {
+  padding: 2.5rem 2rem;
+  margin-top: 1.5rem;
+}
+
+.footer_content {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.copyright {
+  font-size: 1.2rem;
+}

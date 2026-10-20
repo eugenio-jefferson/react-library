@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { memo, useState } from "react";
+import { Link } from "react-router";
+import { cn } from "cn";
 import {
   Card,
   CardDescription,
@@ -6,24 +8,41 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isSafeImageSource } from "@/utils/sanitize";
 
 interface BookCardProps {
+  readonly id?: string;
   readonly title: string;
   readonly author: string;
   readonly cover_image: string;
+  readonly fill?: boolean;
 }
 
-export function BookCard({ title, author, cover_image }: BookCardProps) {
+export const BookCard = memo(function BookCard({
+  id,
+  title,
+  author,
+  cover_image,
+  fill = false,
+}: BookCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const safeCoverSource = isSafeImageSource(cover_image)
+    ? cover_image
+    : undefined;
 
-  return (
-    <Card className="relative mx-auto w-full max-w-3xs pt-0 overflow-hidden shadow-xs">
+  const card = (
+    <Card
+      className={cn(
+        "relative w-full pt-0 overflow-hidden shadow-xs max-w-3xs",
+        !fill && "mx-auto max-w-3xs",
+      )}
+    >
       <div className="relative aspect-2/3 w-full bg-muted/60 overflow-hidden">
         {!imageLoaded && (
           <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
         )}
         <img
-          src={cover_image}
+          src={safeCoverSource}
           alt={title}
           loading="lazy"
           decoding="async"
@@ -41,7 +60,18 @@ export function BookCard({ title, author, cover_image }: BookCardProps) {
       </CardHeader>
     </Card>
   );
-}
+
+  if (!id) return card;
+
+  return (
+    <Link
+      to={`/books/${id}`}
+      className="transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-ring/50"
+    >
+      {card}
+    </Link>
+  );
+});
 
 export function BookCardSkeleton() {
   return (
