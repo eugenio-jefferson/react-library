@@ -212,10 +212,16 @@ function BookReader({ readingPages }: Readonly<BookReaderProps>) {
                 imageReady ? "opacity-100" : "opacity-0"
               }`}
               onLoad={() =>
-                setLoadedImage({ url: currentPage.imageUrl, attempt: imageAttempt })
+                setLoadedImage({
+                  url: currentPage.imageUrl,
+                  attempt: imageAttempt,
+                })
               }
               onError={() =>
-                setFailedImage({ url: currentPage.imageUrl, attempt: imageAttempt })
+                setFailedImage({
+                  url: currentPage.imageUrl,
+                  attempt: imageAttempt,
+                })
               }
             />
           </>
@@ -273,6 +279,7 @@ export default function ReadingPage() {
   );
 
   const [returnOpen, setReturnOpen] = useState(false);
+  const [previewEmbedLoaded, setPreviewEmbedLoaded] = useState(false);
 
   const activeLoan = info?.activeLoan ?? null;
   const overdue = activeLoan ? isOverdue(activeLoan.due_date) : false;
@@ -376,7 +383,9 @@ export default function ReadingPage() {
           <h1 className="truncate font-bold text-lg leading-tight">
             {book.title}
           </h1>
-          <p className="truncate text-sm text-muted-foreground">{book.author}</p>
+          <p className="truncate text-sm text-muted-foreground">
+            {book.author}
+          </p>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
@@ -392,7 +401,11 @@ export default function ReadingPage() {
             {formatLoanDate(activeLoan.due_date)}
           </span>
         </p>
-        <Button variant="secondary" size="sm" onClick={() => setReturnOpen(true)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => setReturnOpen(true)}
+        >
           <BookUp className="size-4" />
           Return book
         </Button>
@@ -414,9 +427,8 @@ export default function ReadingPage() {
       {renderHeader()}
       <div className="flex w-full flex-col items-start justify-between gap-3 rounded-lg border border-muted-foreground/30 bg-background p-3 shadow-lg sm:flex-row sm:items-center">
         <p className="text-sm text-muted-foreground">
-          Showing a{" "}
-          <span className="font-medium text-foreground">preview</span> — the
-          full text isn&apos;t available for in-app reading.
+          Showing a <span className="font-medium text-foreground">preview</span>{" "}
+          — the full text isn&apos;t available for in-app reading.
         </p>
         <Button
           render={
@@ -435,12 +447,24 @@ export default function ReadingPage() {
         </Button>
       </div>
       <div className="relative h-[calc(100svh-21rem)] min-h-[55svh] w-full overflow-hidden rounded-lg border border-muted-foreground/30 bg-background shadow-lg">
-        <iframe
-          src={openLibraryService.formatReaderUrl(identifier)}
-          title={`Preview of ${book.title}`}
-          className="absolute inset-0 h-full w-full border-0"
-          allow="fullscreen"
-        />
+        {previewEmbedLoaded ? (
+          <iframe
+            src={openLibraryService.formatReaderUrl(identifier)}
+            title={`Preview of ${book.title}`}
+            className="absolute inset-0 h-full w-full border-0"
+            allow="fullscreen"
+          />
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+            <BookOpen className="size-8 text-muted-foreground" />
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Click in the button below to load the interactive book preview.
+            </p>
+            <Button onClick={() => setPreviewEmbedLoaded(true)}>
+              Load interactive preview
+            </Button>
+          </div>
+        )}
       </div>
       {renderReturnDialog()}
     </article>
@@ -489,7 +513,10 @@ export default function ReadingPage() {
             You can still borrow it and read the catalog details.
           </p>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button render={<Link to={`/books/${book.id}`} />} variant="outline">
+            <Button
+              render={<Link to={`/books/${book.id}`} />}
+              variant="outline"
+            >
               Back to book
             </Button>
             <Button

@@ -199,6 +199,16 @@ describe("ReadingPage", () => {
 
     renderReadingPage();
 
+    const loadButton = await screen.findByRole("button", {
+      name: /load interactive preview/i,
+    });
+    expect(loadButton).toBeInTheDocument();
+    expect(
+      screen.queryByTitle("Preview of Pride and Prejudice"),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(loadButton);
+
     const preview = await screen.findByTitle("Preview of Pride and Prejudice");
     expect(preview).toHaveAttribute(
       "src",
@@ -230,6 +240,13 @@ describe("ReadingPage", () => {
       .mockResolvedValue("pride-and-prejudice_202606");
 
     renderReadingPage();
+
+    const loadButton = await screen.findByRole("button", {
+      name: /load interactive preview/i,
+    });
+    expect(loadButton).toBeInTheDocument();
+
+    fireEvent.click(loadButton);
 
     const preview = await screen.findByTitle("Preview of Pride and Prejudice");
     expect(preview).toHaveAttribute(

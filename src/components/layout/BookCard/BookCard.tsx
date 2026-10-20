@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Link } from "react-router";
 import {
   Card,
@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isSafeImageSource } from "@/utils/sanitize";
 
 interface BookCardProps {
   readonly id?: string;
@@ -15,8 +16,16 @@ interface BookCardProps {
   readonly cover_image: string;
 }
 
-export function BookCard({ id, title, author, cover_image }: BookCardProps) {
+export const BookCard = memo(function BookCard({
+  id,
+  title,
+  author,
+  cover_image,
+}: BookCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const safeCoverSource = isSafeImageSource(cover_image)
+    ? cover_image
+    : undefined;
 
   const card = (
     <Card className="relative mx-auto w-full max-w-3xs pt-0 overflow-hidden shadow-xs">
@@ -25,7 +34,7 @@ export function BookCard({ id, title, author, cover_image }: BookCardProps) {
           <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
         )}
         <img
-          src={cover_image}
+          src={safeCoverSource}
           alt={title}
           loading="lazy"
           decoding="async"
@@ -54,7 +63,7 @@ export function BookCard({ id, title, author, cover_image }: BookCardProps) {
       {card}
     </Link>
   );
-}
+});
 
 export function BookCardSkeleton() {
   return (
