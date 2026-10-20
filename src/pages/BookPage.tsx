@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, BookBookmarkIcon, BookUp } from "lucide-react";
+import { ArrowLeft, BookBookmarkIcon, BookUp, Heart } from "lucide-react";
 import { useBookDetails } from "@/hooks/useBookDetails";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,6 +17,8 @@ import { useBookLoanInfo } from "@/hooks/useBookLoanInfo";
 import { formatLoanDate, isOverdue } from "@/components/loan/loanDates";
 import LoanBadge, { type LoanBadgeState } from "@/components/loan/LoanBadge";
 import ReturnBookDialog from "@/components/loan/ReturnBookDialog";
+import { useBookWishlistStatus } from "@/hooks/useBookWishlistStatus";
+import AddToWishlistDialog from "@/components/wishlist/AddToWishlistDialog";
 
 function BookPageSkeleton() {
   return (
@@ -83,6 +85,7 @@ export default function BookPage() {
     isLoading: isLoanInfoLoading,
     isError: isLoanInfoError,
   } = useBookLoanInfo(book?.id, user?.id);
+  const { status: wishlistStatus } = useBookWishlistStatus(book?.id, user?.id);
 
   const activeLoan = info?.activeLoan ?? null;
   const overdue = activeLoan ? isOverdue(activeLoan.due_date) : false;
@@ -91,8 +94,10 @@ export default function BookPage() {
     info != null &&
     info.availableCopies !== null &&
     info.availableCopies <= 0;
+  const inWishlist = wishlistStatus?.isInWishlist ?? false;
   const [borrowOpen, setBorrowOpen] = useState(false);
   const [returnOpen, setReturnOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
 
   const goBack = () => {
     navigate(-1);
@@ -104,6 +109,14 @@ export default function BookPage() {
       return;
     }
     setBorrowOpen(true);
+  };
+
+  const handleWishlistClick = () => {
+    if (!isAuthenticated) {
+      navigate("/login", { state: { from: location.pathname } });
+      return;
+    }
+    setWishlistOpen(true);
   };
 
   const badgeState = (): LoanBadgeState => {
@@ -170,7 +183,7 @@ export default function BookPage() {
             </p>
             <LoanBadge state={badgeState()} className="text-md" />
             {activeLoan ? (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground text-center">
                 Return on{" "}
                 <span
                   className={
@@ -186,28 +199,44 @@ export default function BookPage() {
               <></>
             )}
           </CardContent>
-          <CardFooter className="flex w-full justify-center pt-8 pb-8">
-            {!activeLoan ? (
+          <CardFooter className="flex w-full flex-col items-center gap-3 pt-8 pb-8">
+            <div className="flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+              {!activeLoan ? (
+                <Button
+                  size="lg"
+                  onClick={handleBorrowClick}
+                  disabled={Boolean(unavailable)}
+                  className="w-full h-10 text-xl sm:w-60"
+                >
+                  <BookBookmarkIcon className="size-6" />
+                  <span className="pl-3">Borrow this book</span>
+                </Button>
+              ) : (
+                <Button
+                  size="lg"
+                  onClick={() => setReturnOpen(true)}
+                  className="w-full h-10 text-xl sm:w-60"
+                  variant="secondary"
+                >
+                  <BookUp className="size-6" />
+                  <span className="pl-3">Return this book</span>
+                </Button>
+              )}
               <Button
                 size="lg"
-                onClick={handleBorrowClick}
-                disabled={unavailable}
-                className="cursor-pointer w-60 h-10 text-xl"
+                variant="outline"
+                onClick={handleWishlistClick}
+                className="cursor-pointer w-full h-10 text-xl sm:w-60"
               >
-                <BookBookmarkIcon className="size-6" />
-                <span className="pl-3">Borrow this book</span>
+                <Heart
+                  className="size-6"
+                  fill={inWishlist ? "currentColor" : "none"}
+                />
+                <span className="pl-3">
+                  {inWishlist ? "In your wish lists" : "Add to wish list"}
+                </span>
               </Button>
-            ) : (
-              <Button
-                size="lg"
-                onClick={() => setReturnOpen(true)}
-                className="cursor-pointer w-60 h-10 text-xl"
-                variant="secondary"
-              >
-                <BookUp className="size-6" />
-                <span className="pl-3">Return this book</span>
-              </Button>
-            )}
+            </div>
             {activeLoan ? (
               <ReturnBookDialog
                 loan={activeLoan}
@@ -222,6 +251,12 @@ export default function BookPage() {
                 onOpenChange={setBorrowOpen}
               />
             )}
+            <AddToWishlistDialog
+              book={book}
+              memberships={wishlistStatus?.memberships}
+              open={wishlistOpen}
+              onOpenChange={setWishlistOpen}
+            />
           </CardFooter>
         </Card>
         <Card className="flex w-full flex-col gap-4 items-center border border-muted-foreground/30 shadow-lg pt-10 pb-10 pr-4 pl-4">
