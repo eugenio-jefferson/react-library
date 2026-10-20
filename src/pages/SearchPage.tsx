@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router";
 import SearchBar from "../components/layout/SearchBar";
 import Catalog from "@/components/layout/Catalog";
@@ -38,11 +38,15 @@ function SearchPage() {
     debounceMs: 400,
   });
 
+  const lastUrlQueryRef = useRef(urlQuery);
   useEffect(() => {
-    if (urlQuery && urlQuery !== query) {
-      setQuery(urlQuery);
+    if (urlQuery !== lastUrlQueryRef.current) {
+      lastUrlQueryRef.current = urlQuery;
+      if (urlQuery) {
+        setQuery(urlQuery);
+      }
     }
-  }, [urlQuery, query, setQuery]);
+  }, [urlQuery, setQuery]);
 
   const handleSearchSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
