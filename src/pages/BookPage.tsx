@@ -25,6 +25,7 @@ import LoanBadge, { type LoanBadgeState } from "@/components/loan/LoanBadge";
 import ReturnBookDialog from "@/components/loan/ReturnBookDialog";
 import { useBookWishlistStatus } from "@/hooks/useBookWishlistStatus";
 import AddToWishlistDialog from "@/components/wishlist/AddToWishlistDialog";
+import { isSafeImageSource } from "@/utils/sanitize";
 
 function BookPageSkeleton() {
   return (
@@ -172,7 +173,9 @@ export default function BookPage() {
               <Skeleton className="aspect-2/3 w-48 shrink-0 rounded-lg md:w-64" />
             )}
             <img
-              src={book.cover_image}
+              src={
+                isSafeImageSource(book.cover_image) ? book.cover_image : undefined
+              }
               loading="lazy"
               alt={book.title}
               decoding="async"

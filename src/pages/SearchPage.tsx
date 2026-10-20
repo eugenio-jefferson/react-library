@@ -5,6 +5,7 @@ import Catalog from "@/components/layout/Catalog";
 import SearchControlsBar from "@/components/layout/SearchControlsBar";
 import { useBookSearch } from "@/hooks/useBookSearch";
 import { Button } from "@/components/ui/button";
+import { sanitizeSearchQuery } from "@/utils/sanitize";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function SearchPage() {
@@ -50,8 +51,9 @@ function SearchPage() {
 
   const handleSearchSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (query) {
-      setSearchParams({ q: query });
+    const cleanQuery = sanitizeSearchQuery(query);
+    if (cleanQuery) {
+      setSearchParams({ q: cleanQuery });
     }
   };
 

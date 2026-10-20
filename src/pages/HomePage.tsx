@@ -6,6 +6,7 @@ import { useHomeCatalog } from "@/hooks/useHomeCatalog";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Flame, BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { sanitizeSearchQuery } from "@/utils/sanitize";
 
 function Home() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ function Home() {
 
   const handleSearch = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const cleanQuery = query.trim();
+    const cleanQuery = sanitizeSearchQuery(query);
     if (!cleanQuery) return;
     navigate(`/search?q=${encodeURIComponent(cleanQuery)}`);
   };

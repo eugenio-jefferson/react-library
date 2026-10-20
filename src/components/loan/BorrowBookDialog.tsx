@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useLoanActions } from "@/hooks/useLoanActions";
+import { validateDueDate } from "@/utils/validation";
 import { defaultDueDate, toLocalDateInput } from "./loanDates";
 
 export interface BorrowBookDialogProps {
@@ -27,10 +28,15 @@ function BorrowBookForm({
   const { borrowBook, isSubmittingBorrow, isErrorBorrow, borrowError } =
     useLoanActions();
   const [dueDate, setDueDate] = useState(defaultDueDate);
+  const [dueDateError, setDueDateError] = useState<string | null>(null);
   const today = toLocalDateInput(new Date());
 
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const validationError = validateDueDate(dueDate);
+    setDueDateError(validationError);
+    if (validationError) return;
 
     borrowBook(
       {
@@ -53,14 +59,32 @@ function BorrowBookForm({
           value={dueDate}
           min={today}
           required
-          onChange={(event) => setDueDate(event.target.value)}
+          onChange={(event) => {
+            setDueDate(event.target.value);
+            setDueDateError(null);
+          }}
+          aria-invalid={Boolean(dueDateError)}
+          aria-describedby={
+            dueDateError ? "due-date-error" : "due-date-hint"
+          }
         />
-        <p className="text-xs text-muted-foreground">
+        <p id="due-date-hint" className="text-xs text-muted-foreground">
           The book must be returned by this date.
         </p>
+        {dueDateError && (
+          <p
+            id="due-date-error"
+            role="alert"
+            className="text-sm text-destructive"
+          >
+            {dueDateError}
+          </p>
+        )}
       </div>
       {isErrorBorrow && (
-        <p className="text-sm text-destructive">{borrowError?.message}</p>
+        <p role="alert" className="text-sm text-destructive">
+          {borrowError?.message}
+        </p>
       )}
       <DialogFooter>
         <Button

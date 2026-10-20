@@ -24,6 +24,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { useWishlists } from "@/hooks/useWishlists";
 import { useWishlistActions } from "@/hooks/useWishlistActions";
+import { sanitizeText } from "@/utils/sanitize";
+import {
+  MAX_WISHLIST_NAME_LENGTH,
+  validateWishlistName,
+} from "@/utils/validation";
 
 const CREATE_NEW_VALUE = "__create_new__";
 
@@ -59,6 +64,7 @@ function AddToWishlistForm({
   const allWishlists = wishlists ?? [];
   const [selected, setSelected] = useState<string | null>(null);
   const [newListName, setNewListName] = useState("");
+  const [newListNameError, setNewListNameError] = useState<string | null>(null);
 
   const effectiveSelectedId = isLoading
     ? null
@@ -84,7 +90,11 @@ function AddToWishlistForm({
     event.preventDefault();
 
     if (isCreateNew) {
-      createWishlist(newListName, {
+      const validationError = validateWishlistName(newListName);
+      setNewListNameError(validationError);
+      if (validationError) return;
+
+      createWishlist(sanitizeText(newListName, MAX_WISHLIST_NAME_LENGTH), {
         onSuccess: (created) => {
           setNewListName("");
           addBook(
@@ -172,16 +182,32 @@ function AddToWishlistForm({
                 id="new-wishlist-name"
                 value={newListName}
                 placeholder="e.g. Sci-Fi Must Reads"
-                maxLength={100}
+                maxLength={MAX_WISHLIST_NAME_LENGTH}
                 required
-                onChange={(event) => setNewListName(event.target.value)}
+                onChange={(event) => {
+                  setNewListName(event.target.value);
+                  setNewListNameError(null);
+                }}
+                aria-invalid={Boolean(newListNameError)}
+                aria-describedby={
+                  newListNameError ? "new-wishlist-name-error" : undefined
+                }
               />
+              {newListNameError && (
+                <p
+                  id="new-wishlist-name-error"
+                  role="alert"
+                  className="text-sm text-destructive"
+                >
+                  {newListNameError}
+                </p>
+              )}
             </div>
           )}
         </>
       )}
       {(isErrorAdd || isErrorCreate || isErrorRemove) && (
-        <p className="text-sm text-destructive">
+        <p role="alert" className="text-sm text-destructive">
           {addError?.message || createError?.message || removeError?.message}
         </p>
       )}

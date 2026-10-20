@@ -12,6 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useWishlistActions } from "@/hooks/useWishlistActions";
+import { sanitizeText } from "@/utils/sanitize";
+import {
+  MAX_WISHLIST_NAME_LENGTH,
+  validateWishlistName,
+} from "@/utils/validation";
 
 export interface WishlistFormDialogProps {
   readonly onOpenChange: (open: boolean) => void;
@@ -35,11 +40,13 @@ function WishlistFormDialog({
     renameError,
   } = useWishlistActions();
   const [name, setName] = useState(wishlist?.name ?? "");
+  const [nameError, setNameError] = useState<string | null>(null);
   const [wasOpen, setWasOpen] = useState(open);
 
   if (open !== wasOpen) {
     setWasOpen(open);
     setName(wishlist?.name ?? "");
+    setNameError(null);
   }
 
   const isRenamingWishlist = Boolean(wishlist);
@@ -48,9 +55,15 @@ function WishlistFormDialog({
   const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const validationError = validateWishlistName(name);
+    setNameError(validationError);
+    if (validationError) return;
+
+    const sanitizedName = sanitizeText(name, MAX_WISHLIST_NAME_LENGTH);
+
     if (isRenamingWishlist && wishlist) {
       renameWishlist(
-        { wishlistId: wishlist.id, name },
+        { wishlistId: wishlist.id, name: sanitizedName },
         {
           onSuccess: () => onOpenChange(false),
         },
@@ -58,7 +71,7 @@ function WishlistFormDialog({
       return;
     }
 
-    createWishlist(name, {
+    createWishlist(sanitizedName, {
       onSuccess: () => onOpenChange(false),
     });
   };
@@ -83,13 +96,28 @@ function WishlistFormDialog({
               id="wishlist-name"
               value={name}
               placeholder="e.g. Study Materials"
-              maxLength={100}
+              maxLength={MAX_WISHLIST_NAME_LENGTH}
               required
-              onChange={(event) => setName(event.target.value)}
+              onChange={(event) => {
+                setName(event.target.value);
+                setNameError(null);
+              }}
+              aria-invalid={Boolean(nameError)}
+              aria-describedby={
+                nameError ? "wishlist-name-error" : "wishlist-name-hint"
+              }
             />
+            <p id="wishlist-name-hint" className="text-xs text-muted-foreground">
+              Up to {MAX_WISHLIST_NAME_LENGTH} characters.
+            </p>
+            {nameError && (
+              <p id="wishlist-name-error" role="alert" className="text-sm text-destructive">
+                {nameError}
+              </p>
+            )}
           </div>
           {(isErrorCreate || isErrorRename) && (
-            <p className="text-sm text-destructive">
+            <p role="alert" className="text-sm text-destructive">
               {isRenamingWishlist
                 ? renameError?.message
                 : createError?.message}
