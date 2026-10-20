@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { SignupForm } from "@/components/form/signup-form";
+import { SignupForm } from "@/components/auth/signup-form";
 import { GalleryVerticalEnd } from "lucide-react";
 
 function Register() {

@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { GalleryVerticalEnd } from "lucide-react";
-import { LoginForm } from "@/components/form/login-form";
+import { LoginForm } from "@/components/auth/login-form";
 
 function Login() {
   return (
