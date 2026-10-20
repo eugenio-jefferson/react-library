@@ -31,6 +31,11 @@ function NotificationsList({
           <div
             role="button"
             tabIndex={0}
+            aria-label={
+              notification.is_read
+                ? `Open notification: ${notification.title}`
+                : `Open unread notification: ${notification.title}`
+            }
             onClick={() => onOpen(notification)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {

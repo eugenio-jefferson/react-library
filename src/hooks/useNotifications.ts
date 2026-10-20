@@ -23,6 +23,7 @@ export function useNotifications(
     queryFn: () => notificationService.getMyNotifications(userId as string),
     enabled: Boolean(userId),
     refetchInterval: userId ? NOTIFICATIONS_POLL_INTERVAL_MS : false,
+    refetchIntervalInBackground: false,
   });
 
   return {

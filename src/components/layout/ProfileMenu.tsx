@@ -80,11 +80,19 @@ function ProfileMenu() {
           >
             <User className="h-[1.2rem] w-[1.2rem]" />
             {isMobile && session && unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 font-medium text-[9px] text-destructive-foreground">
+              <span
+                aria-hidden="true"
+                className="absolute -top-0.5 -right-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-destructive px-0.5 font-medium text-[9px] text-destructive-foreground"
+              >
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
-            <span className="sr-only">Profile</span>
+            <span className="sr-only">
+              Profile
+              {isMobile && session && unreadCount > 0
+                ? ` (${unreadCount} unread notifications)`
+                : ""}
+            </span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-fit">
@@ -110,9 +118,14 @@ function ProfileMenu() {
                   <Bell className="mr-2 h-4 w-4" />
                   Notifications
                   {unreadCount > 0 && (
-                    <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-medium text-[10px] text-destructive-foreground">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
+                    <>
+                      <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-medium text-[10px] text-destructive-foreground">
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                      <span className="sr-only">
+                        {unreadCount} unread
+                      </span>
+                    </>
                   )}
                 </DropdownMenuItem>
               )}

@@ -48,6 +48,8 @@ export default function SearchBar({
           value={currentQuery}
           onChange={handleChange}
           placeholder={placeholder}
+          aria-label="Search books"
+          maxLength={200}
           className="h-15 rounded-full border-2 placeholder:italic px-4"
         />
         <Button type="submit" className="h-15 w-30 rounded-full text-[1rem]">

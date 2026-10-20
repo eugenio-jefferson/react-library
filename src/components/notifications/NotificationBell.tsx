@@ -27,9 +27,15 @@ function NotificationBell() {
         onClick={() => setOpen(true)}
       >
         <Bell className="h-[1.2rem] w-[1.2rem]" />
-        <span className="sr-only">Notifications</span>
+        <span className="sr-only">
+          Notifications
+          {unreadCount > 0 ? ` (${unreadCount} unread)` : ""}
+        </span>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-medium text-[10px] text-destructive-foreground">
+          <span
+            aria-hidden="true"
+            className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-medium text-[10px] text-destructive-foreground"
+          >
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
