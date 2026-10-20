@@ -8,14 +8,19 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import {
   Bell,
+  Computer,
   Heart,
   LibraryBig,
   LogInIcon,
   LogOut,
+  Moon,
+  Sun,
   User,
   UserRoundArrowLeft,
 } from "lucide-react";
@@ -25,11 +30,13 @@ import { useNotifications } from "@/hooks/useNotifications";
 import NotificationsDialog from "@/components/notifications/NotificationsDialog";
 import { supabase } from "@/services/supabaseClient";
 import type { Session } from "@supabase/supabase-js";
+import { useTheme } from "@/hooks/useTheme";
 
 function ProfileMenu() {
   const navigate = useNavigate();
   const { signOut } = useUserAccount();
   const isMobile = useIsMobile();
+  const { setTheme } = useTheme();
   const [session, setSession] = useState<Session | null>(null);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const { notifications } = useNotifications(
@@ -127,6 +134,36 @@ function ProfileMenu() {
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
+
+              {isMobile && (
+                <>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Settings</DropdownMenuLabel>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                        <Moon className="absolute h-4 w-4 scale-0 rotate-0 transition-all dark:scale-100 dark:-rotate-90" />
+                        <span className="ml-2">Toggle Theme</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setTheme("light")}>
+                          <Sun />
+                          Light
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme("dark")}>
+                          <Moon />
+                          Dark
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme("system")}>
+                          <Computer />
+                          System
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenuSub>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                </>
+              )}
 
               <DropdownMenuItem
                 onClick={handleLogout}
