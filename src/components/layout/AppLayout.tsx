@@ -1,5 +1,6 @@
 import { Outlet } from "react-router";
 import Header from "./Header";
+import Footer from "./Footer";
 
 function AppLayout() {
   return (
@@ -17,6 +18,8 @@ function AppLayout() {
       <main id="main-content" tabIndex={-1}>
         <Outlet />
       </main>
+
+      <Footer />
     </>
   );
 }
