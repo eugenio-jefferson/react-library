@@ -25,7 +25,7 @@ const badgeConfig: Record<
   },
   unavailable: {
     label: "No copies available",
-    className: "border-muted-foreground/40 bg-muted text-muted-foreground",
+    className: "border-muted-foreground/80 bg-muted text-muted-foreground",
   },
   returned: {
     label: "Returned",

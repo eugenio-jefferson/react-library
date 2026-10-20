@@ -90,7 +90,6 @@ export default function BookPage() {
   const activeLoan = info?.activeLoan ?? null;
   const overdue = activeLoan ? isOverdue(activeLoan.due_date) : false;
   const unavailable =
-    activeLoan &&
     info != null &&
     info.availableCopies !== null &&
     info.availableCopies <= 0;
