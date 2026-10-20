@@ -122,9 +122,7 @@ function ProfileMenu() {
                       <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-medium text-[10px] text-destructive-foreground">
                         {unreadCount > 9 ? "9+" : unreadCount}
                       </span>
-                      <span className="sr-only">
-                        {unreadCount} unread
-                      </span>
+                      <span className="sr-only">{unreadCount} unread</span>
                     </>
                   )}
                 </DropdownMenuItem>
@@ -188,6 +186,35 @@ function ProfileMenu() {
             </>
           ) : (
             <>
+              {isMobile && (
+                <>
+                  <DropdownMenuGroup>
+                    <DropdownMenuLabel>Settings</DropdownMenuLabel>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger>
+                        <Sun className="h-4 w-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+                        <Moon className="absolute h-4 w-4 scale-0 rotate-0 transition-all dark:scale-100 dark:-rotate-90" />
+                        <span className="ml-2">Toggle Theme</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setTheme("light")}>
+                          <Sun />
+                          Light
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme("dark")}>
+                          <Moon />
+                          Dark
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setTheme("system")}>
+                          <Computer />
+                          System
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenuSub>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem
                 onClick={() => navigate("/login")}
                 className="cursor-pointer"
