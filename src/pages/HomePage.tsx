@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import SearchBar from "../components/layout/SearchBar";
-import Catalog from "@/components/layout/Catalog";
+import CatalogCarousel from "@/components/layout/CatalogCarousel";
 import { useHomeCatalog } from "@/hooks/useHomeCatalog";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Flame, BookOpen } from "lucide-react";
@@ -23,12 +23,12 @@ function Home() {
   };
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-8 bg-muted p-6 md:p-10">
-      <Card className="flex w-[95dvw] max-w-4xl py-10 flex-col items-center gap-4 text-center">
-        <h1 className="text-3xl py-4 font-extrabold tracking-tight md:text-5xl">
+    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-8 bg-muted p-4 sm:p-6 md:p-10">
+      <Card className="flex w-full max-w-4xl py-8 flex-col items-center gap-4 text-center md:py-10">
+        <h1 className="text-2xl py-4 pr-6 pl-6 font-extrabold tracking-tight sm:text-3xl md:text-5xl">
           Discover Your Next Great Read
         </h1>
-        <p className="max-w-xl text-md font-medium py-2 md:text-xl">
+        <p className="max-w-xl text-md font-medium py-2 pl-6 pr-6 md:text-xl">
           Explore trending books and browse through curated genres.
         </p>
         <div className="w-[calc(100%-2rem)] max-w-md pb-4 pt-2">
@@ -73,7 +73,7 @@ function Home() {
                 Loading...
               </span>
             </div>
-            <Catalog isLoading={true} skeletonCount={6} />
+            <CatalogCarousel isLoading={true} skeletonCount={6} />
           </section>
 
           {["Fiction", "Fantasy"].map((genreName) => (
@@ -87,7 +87,7 @@ function Home() {
                   Loading...
                 </span>
               </div>
-              <Catalog isLoading={true} skeletonCount={6} />
+              <CatalogCarousel isLoading={true} skeletonCount={6} />
             </section>
           ))}
         </div>
@@ -105,7 +105,7 @@ function Home() {
                     {trending.length} books
                   </span>
                 </div>
-                <Catalog books={trending} />
+                <CatalogCarousel books={trending} label="Trending books" />
               </section>
             )}
 
@@ -122,7 +122,10 @@ function Home() {
                       {cat.books.length} books
                     </span>
                   </div>
-                  <Catalog books={cat.books} />
+                  <CatalogCarousel
+                    books={cat.books}
+                    label={cat.categoryLabel}
+                  />
                 </section>
               );
             })}
