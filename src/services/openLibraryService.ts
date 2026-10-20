@@ -1,4 +1,4 @@
-import type { OpenLibraryAuthorResponse, OpenLibraryDoc, OpenLibrarySearchResponse, OpenLibraryServiceConfig, OpenLibrarySubjectResponse, OpenLibrarySubjectWork, OpenLibraryTrendingResponse, OpenLibraryWorkDescription, OpenLibraryWorkResponse } from "@/type/openLibrary";
+import type { OpenLibraryAuthorResponse, OpenLibraryDoc, OpenLibraryEditionsResponse, OpenLibrarySearchResponse, OpenLibraryServiceConfig, OpenLibrarySubjectResponse, OpenLibrarySubjectWork, OpenLibraryTrendingResponse, OpenLibraryWorkDescription, OpenLibraryWorkResponse } from "@/type/openLibrary";
 import type {
   Book,
   BookDetails,
@@ -9,6 +9,7 @@ import type {
   CategoryDefinition,
   HomeCatalogData,
 } from "../type/book";
+import type { ReadingPages, ReadingSource, ArchiveSearchResponse, IIIFManifest, IIIFCanvas } from "../type/reading";
 import { RateLimiter } from "./rateLimiter";
 
 export const DEFAULT_PLACEHOLDER_COVER =
@@ -258,6 +259,141 @@ export class OpenLibraryService {
     };
   }
 
+  public async getReadingSource(workId: string): Promise<ReadingSource | null> {
+    const normalizedId = this.normalizeWorkId(workId);
+    const editionsUrl = `${this.baseUrl}/works/${encodeURIComponent(
+      normalizedId
+    )}/editions.json?limit=100&fields=key,title,ocaid`;
+
+    const data = await this.rateLimiter.schedule(
+      async () => {
+        const res = await this.fetcher(editionsUrl, {
+          headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+          throw new Error(
+            `Error fetching editions on Open Library (${res.status}: ${res.statusText})`
+          );
+        }
+
+        return (await res.json()) as OpenLibraryEditionsResponse;
+      },
+      `editions_${normalizedId}`
+    );
+
+    const readable = (data.entries || []).filter((entry) =>
+      Boolean(entry.ocaid?.trim())
+    );
+    if (readable.length === 0) return null;
+
+    // bwb_* items are book web bundles, not page-readable scans
+    const edition =
+      readable.find((entry) => !entry.ocaid!.startsWith("bwb_")) ?? readable[0];
+
+    return {
+      workId: normalizedId,
+      iaIdentifier: edition.ocaid!.trim(),
+      editionKey: edition.key || "",
+      editionTitle: edition.title?.trim() || null,
+    };
+  }
+
+  public formatReaderUrl(iaIdentifier: string): string {
+    return `https://archive.org/embed/${encodeURIComponent(
+      iaIdentifier.trim()
+    )}`;
+  }
+
+  public async getReadingPages(iaIdentifier: string): Promise<ReadingPages> {
+    const identifier = iaIdentifier.trim();
+    const manifestUrl = `https://iiif.archive.org/iiif/${encodeURIComponent(
+      identifier
+    )}/manifest.json`;
+
+    const manifest = await this.rateLimiter.schedule(
+      async () => {
+        const res = await this.fetcher(manifestUrl, {
+          headers: { Accept: "application/ld+json, application/json" },
+        });
+
+        if (!res.ok) {
+          throw new Error(
+            `Error fetching book pages (${res.status}: ${res.statusText})`
+          );
+        }
+
+        return (await res.json()) as IIIFManifest;
+      },
+      `manifest_${identifier}`
+    );
+
+    const canvases = manifest.items || manifest.sequences?.[0]?.canvases || [];
+
+    const pages = canvases.flatMap((canvas, index) => {
+      const imageUrl = this.resolveCanvasImageUrl(canvas);
+      if (!imageUrl) return [];
+      return [
+        {
+          index,
+          label: this.parseCanvasLabel(canvas.label) ?? String(index + 1),
+          imageUrl,
+        },
+      ];
+    });
+
+    if (pages.length === 0) {
+      throw new Error("No readable pages were found for this book.");
+    }
+
+    return { iaIdentifier: identifier, total: pages.length, pages };
+  }
+
+  public async searchArchiveIdentifier(
+    title: string,
+    author?: string
+  ): Promise<string | null> {
+    const cleanTitle = title.trim();
+    if (!cleanTitle) return null;
+
+    const clauses = [
+      `title:("${this.escapeArchivePhrase(cleanTitle)}")`,
+      "mediatype:texts",
+    ];
+    const cleanAuthor = author?.trim();
+    if (cleanAuthor && cleanAuthor !== "Unknown Author") {
+      clauses.unshift(`creator:("${this.escapeArchivePhrase(cleanAuthor)}")`);
+    }
+
+    const query = clauses.join(" AND ");
+    const searchUrl =
+      "https://archive.org/advancedsearch.php" +
+      `?q=${encodeURIComponent(query)}` +
+      "&fl%5B%5D=identifier&rows=5&page=1&output=json";
+
+    const data = await this.rateLimiter.schedule(
+      async () => {
+        const res = await this.fetcher(searchUrl, {
+          headers: { Accept: "application/json" },
+        });
+
+        if (!res.ok) {
+          throw new Error(
+            `Error searching archive.org (${res.status}: ${res.statusText})`
+          );
+        }
+
+        return (await res.json()) as ArchiveSearchResponse;
+      },
+      `archive_${cleanTitle}_${cleanAuthor || ""}`
+    );
+
+    const identifier = data.response?.docs?.[0]?.identifier;
+    return typeof identifier === "string" && identifier.trim()
+      ? identifier.trim()
+      : null;
+  }
+
   public async getHomeCatalog(
     categories: CategoryDefinition[] = DEFAULT_CATEGORIES,
     limitPerCategory = 10
@@ -320,6 +456,45 @@ export class OpenLibraryService {
     if (!description) return "";
     if (typeof description === "string") return description.trim();
     return (description.value || "").trim();
+  }
+
+  private resolveCanvasImageUrl(canvas: IIIFCanvas): string | null {
+    const v3Body = canvas.items?.[0]?.items?.[0]?.body;
+    const v2Resource = canvas.images?.[0]?.resource;
+
+    const raw =
+      v3Body?.service?.[0]?.id ||
+      v2Resource?.service?.[0]?.id ||
+      v2Resource?.service?.[0]?.["@id"] ||
+      v3Body?.id ||
+      v2Resource?.id ||
+      v2Resource?.["@id"];
+
+    if (!raw) return null;
+    return this.toReaderImageUrl(raw);
+  }
+
+  private escapeArchivePhrase(value: string): string {
+    return value.replace(/["\\]/g, " ").trim();
+  }
+
+  private toReaderImageUrl(raw: string): string {
+    const clean = raw.replace(/\/$/, "");
+    if (clean.includes("/full/")) {
+      return clean.replace("/full/max/", "/full/1000,/");
+    }
+    return `${clean}/full/1000,/0/default.jpg`;
+  }
+
+  private parseCanvasLabel(
+    label: IIIFCanvas["label"] | undefined
+  ): string | null {
+    if (typeof label === "string") return label.trim() || null;
+    if (label && typeof label === "object") {
+      const first = Object.values(label).flat()[0];
+      if (typeof first === "string" && first.trim()) return first.trim();
+    }
+    return null;
   }
 
   private async resolveWorkAuthor(

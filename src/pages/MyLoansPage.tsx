@@ -82,7 +82,15 @@ function MyLoansPage() {
             }
           />
           {showReturnButton && (
-            <Button onClick={() => setReturning(entry)}>Return book</Button>
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <Button
+                render={<Link to={`/books/${book.work_id}/read`} />}
+                className="cursor-pointer"
+              >
+                Read book
+              </Button>
+              <Button onClick={() => setReturning(entry)}>Return book</Button>
+            </div>
           )}
         </div>
       </Card>

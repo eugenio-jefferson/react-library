@@ -74,3 +74,14 @@ export interface OpenLibraryAuthorResponse {
   key?: string;
   name?: string;
 }
+
+export interface OpenLibraryEdition {
+  key?: string;
+  title?: string;
+  ocaid?: string;
+}
+
+export interface OpenLibraryEditionsResponse {
+  key?: string;
+  entries?: OpenLibraryEdition[];
+}

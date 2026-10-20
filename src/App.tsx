@@ -5,6 +5,7 @@ import BookPage from "./pages/BookPage";
 import HomePage from "./pages/HomePage";
 import Login from "./pages/Login";
 import MyLoansPage from "./pages/MyLoansPage";
+import ReadingPage from "./pages/ReadingPage";
 import Register from "./pages/Register";
 import SearchPage from "./pages/SearchPage";
 import WishlistsPage from "./pages/WishlistsPage";
@@ -18,6 +19,14 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/books/:id" element={<BookPage />} />
+        <Route
+          path="/books/:id/read"
+          element={
+            <RequireAuth>
+              <ReadingPage />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/loans"
           element={

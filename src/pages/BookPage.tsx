@@ -1,5 +1,11 @@
-import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, BookBookmarkIcon, BookUp, Heart } from "lucide-react";
+import { Link, useNavigate, useParams } from "react-router";
+import {
+  ArrowLeft,
+  BookBookmarkIcon,
+  BookOpen,
+  BookUp,
+  Heart,
+} from "lucide-react";
 import { useBookDetails } from "@/hooks/useBookDetails";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -211,15 +217,25 @@ export default function BookPage() {
                   <span className="pl-3">Borrow this book</span>
                 </Button>
               ) : (
-                <Button
-                  size="lg"
-                  onClick={() => setReturnOpen(true)}
-                  className="w-full h-10 text-xl sm:w-60"
-                  variant="secondary"
-                >
-                  <BookUp className="size-6" />
-                  <span className="pl-3">Return this book</span>
-                </Button>
+                <>
+                  <Button
+                    render={<Link to={`/books/${book.id}/read`} />}
+                    size="lg"
+                    className="cursor-pointer w-full h-10 text-xl sm:w-60"
+                  >
+                    <BookOpen className="size-6" />
+                    <span className="pl-3">Read this book</span>
+                  </Button>
+                  <Button
+                    size="lg"
+                    onClick={() => setReturnOpen(true)}
+                    className="w-full h-10 text-xl sm:w-60"
+                    variant="secondary"
+                  >
+                    <BookUp className="size-6" />
+                    <span className="pl-3">Return this book</span>
+                  </Button>
+                </>
               )}
               <Button
                 size="lg"
