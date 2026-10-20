@@ -59,17 +59,15 @@ function WishlistsPage() {
           <div className="flex flex-col gap-1">
             <h2 className="font-bold text-lg">{wishlist.name}</h2>
             <p className="text-sm text-muted-foreground">
-              Created on {formatLoanDate(wishlist.created_at)} ·{" "}
-              {items.length} {items.length === 1 ? "book" : "books"}
+              Created on {formatLoanDate(wishlist.created_at)} · {items.length}{" "}
+              {items.length === 1 ? "book" : "books"}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="sm"
-              onClick={() =>
-                setExpandedId(isExpanded ? null : wishlist.id)
-              }
+              onClick={() => setExpandedId(isExpanded ? null : wishlist.id)}
             >
               {isExpanded ? "Hide books" : "View books"}
             </Button>
@@ -195,15 +193,13 @@ function WishlistsPage() {
   }
 
   if (!user) {
-    return (
-      <Navigate to="/login" replace state={{ from: "/wishlists" }} />
-    );
+    return <Navigate to="/login" replace state={{ from: "/wishlists" }} />;
   }
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-5 bg-muted p-5 md:p-10">
+    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-5 bg-muted p-4 sm:p-5 md:p-10">
       <section className="flex w-full max-w-4xl flex-col gap-6">
-        <Card className="flex w-full flex-col gap-3 border border-muted-foreground/30 p-5 shadow-lg sm:flex-row sm:items-center sm:justify-between">
+        <Card className="flex w-full flex-col gap-3 border border-muted-foreground/30 p-5 shadow-lg">
           <CardHeader className="p-0">
             <CardTitle className="text-2xl font-bold">My Wish Lists</CardTitle>
             <CardDescription>

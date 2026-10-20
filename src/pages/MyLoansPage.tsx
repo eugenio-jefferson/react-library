@@ -44,8 +44,7 @@ function MyLoansPage() {
 
   const renderLoanCard = (entry: LoanWithBook, showReturnButton: boolean) => {
     const { loan, book } = entry;
-    const overdue =
-      loan.status !== "returned" && isOverdue(loan.due_date);
+    const overdue = loan.status !== "returned" && isOverdue(loan.due_date);
 
     return (
       <Card
@@ -57,7 +56,9 @@ function MyLoansPage() {
           <p className="text-sm font-medium text-muted-foreground">
             {book.author}
           </p>
-          <p className="text-sm">Borrowed on {formatLoanDate(loan.borrowed_at)}</p>
+          <p className="text-sm">
+            Borrowed on {formatLoanDate(loan.borrowed_at)}
+          </p>
           <p className="text-sm">
             Return by{" "}
             <span
@@ -123,9 +124,7 @@ function MyLoansPage() {
     if (allLoans.length === 0) {
       return (
         <Card className="flex flex-col items-center justify-center gap-4 p-12 text-center">
-          <p className="text-base">
-            You haven&apos;t borrowed any books yet.
-          </p>
+          <p className="text-base">You haven&apos;t borrowed any books yet.</p>
           <Button render={<Link to="/search" />} variant="outline">
             Browse the catalog
           </Button>
@@ -168,7 +167,7 @@ function MyLoansPage() {
   }
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-5 bg-muted p-5 md:p-10">
+    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-5 bg-muted p-4 sm:p-5 md:p-10">
       <section className="flex w-full max-w-4xl flex-col gap-6">
         <Card className="flex w-full flex-col gap-1 border border-muted-foreground/30 p-5 shadow-lg">
           <CardHeader className="p-0">

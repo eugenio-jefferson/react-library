@@ -11,8 +11,13 @@ function Header() {
 
   return (
     <header className={`${styles.site_header}`} id="header">
-      <div className={`${styles.container} ${styles.nav_container}`}>
-        <Link to={"/"} className="text-[1.15rem] font-bold hover:text-primary">
+      <div
+        className={`${styles.container} ${styles.nav_container} max-w-7xl m-auto`}
+      >
+        <Link
+          to={"/"}
+          className="text-[1.15rem] font-bold hover:text-primary sm:text-[1.5rem] md:text-[1.75rem]"
+        >
           J's Library
         </Link>
 

@@ -33,26 +33,28 @@ function clampPage(value: number, total: number): number {
 
 function ReadingSkeleton() {
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col gap-3 bg-muted p-3 md:p-5">
-      <header className="flex w-full flex-col gap-3 rounded-lg border border-muted-foreground/30 bg-background p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-9" />
-          <div className="flex flex-col gap-1">
-            <Skeleton className="h-5 w-48" />
-            <Skeleton className="h-4 w-32" />
+    <article className="min-h-[calc(100svh-4.3rem)] bg-muted p-3 md:p-5">
+      <div className="flex max-w-7xl m-auto w-full flex-col gap-3 ">
+        <header className="flex w-full flex-col gap-3 rounded-lg border border-muted-foreground/30 bg-background p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="h-9 w-9" />
+            <div className="flex flex-col gap-1">
+              <Skeleton className="h-5 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
           </div>
+          <Skeleton className="h-9 w-28" />
+        </header>
+        <div className="flex w-full flex-wrap items-center justify-center gap-2 rounded-lg border border-muted-foreground/30 bg-background p-2 shadow-lg">
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-8 w-8" />
+          <Skeleton className="h-8 w-8" />
         </div>
-        <Skeleton className="h-9 w-28" />
-      </header>
-      <div className="flex w-full items-center justify-center gap-2 rounded-lg border border-muted-foreground/30 bg-background p-2 shadow-lg">
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-      </div>
-      <div className="flex h-[calc(100svh-19rem)] min-h-[55svh] w-full items-center justify-center overflow-hidden rounded-lg border border-muted-foreground/30 bg-background shadow-lg">
-        <Skeleton className="aspect-2/3 h-[90%]" />
+        <div className="flex h-[calc(100svh-19rem)] min-h-[55svh] w-full items-center justify-center overflow-hidden rounded-lg border border-muted-foreground/30 bg-background shadow-lg">
+          <Skeleton className="aspect-2/3 h-[90%]" />
+        </div>
       </div>
     </article>
   );
@@ -369,7 +371,7 @@ export default function ReadingPage() {
   }
 
   const renderHeader = () => (
-    <header className="flex w-full flex-col gap-3 rounded-lg border border-muted-foreground/30 bg-background p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
+    <header className="flex w-full flex-col gap-3 rounded-lg border border-muted-foreground/30 bg-background p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between max-w-7xl m-auto">
       <div className="flex min-w-0 items-center gap-3">
         <Button
           render={<Link to={`/books/${book.id}`} />}
@@ -423,50 +425,53 @@ export default function ReadingPage() {
   );
 
   const renderPreview = (identifier: string) => (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col gap-3 bg-muted p-3 md:p-5">
-      {renderHeader()}
-      <div className="flex w-full flex-col items-start justify-between gap-3 rounded-lg border border-muted-foreground/30 bg-background p-3 shadow-lg sm:flex-row sm:items-center">
-        <p className="text-sm text-muted-foreground">
-          Showing a <span className="font-medium text-foreground">preview</span>{" "}
-          — the full text isn&apos;t available for in-app reading.
-        </p>
-        <Button
-          render={
-            <a
-              href={`https://archive.org/details/${identifier}`}
-              target="_blank"
-              rel="noreferrer"
+    <article className="min-h-[calc(100svh-4.3rem)] bg-muted">
+      <div className="flex max-w-7xl m-auto w-full flex-col gap-3 p-3 md:p-5">
+        {renderHeader()}
+        <div className="flex w-full flex-col items-start justify-between gap-3 rounded-lg border border-muted-foreground/30 bg-background p-3 shadow-lg sm:flex-row sm:items-center">
+          <p className="text-sm text-muted-foreground">
+            Showing a{" "}
+            <span className="font-medium text-foreground">preview</span> — the
+            full text isn&apos;t available for in-app reading.
+          </p>
+          <Button
+            render={
+              <a
+                href={`https://archive.org/details/${identifier}`}
+                target="_blank"
+                rel="noreferrer"
+              />
+            }
+            variant="outline"
+            size="sm"
+            className="shrink-0 cursor-pointer"
+          >
+            <ExternalLink className="size-4" />
+            Open on archive.org
+          </Button>
+        </div>
+        <div className="relative h-[calc(100svh-21rem)] min-h-[55svh] w-full overflow-hidden rounded-lg border border-muted-foreground/30 bg-background shadow-lg">
+          {previewEmbedLoaded ? (
+            <iframe
+              src={openLibraryService.formatReaderUrl(identifier)}
+              title={`Preview of ${book.title}`}
+              className="absolute inset-0 h-full w-full border-0"
+              allow="fullscreen"
             />
-          }
-          variant="outline"
-          size="sm"
-          className="shrink-0 cursor-pointer"
-        >
-          <ExternalLink className="size-4" />
-          Open on archive.org
-        </Button>
+          ) : (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+              <BookOpen className="size-8 text-muted-foreground" />
+              <p className="max-w-sm text-sm text-muted-foreground">
+                Click in the button below to load the interactive book preview.
+              </p>
+              <Button onClick={() => setPreviewEmbedLoaded(true)}>
+                Load interactive preview
+              </Button>
+            </div>
+          )}
+        </div>
+        {renderReturnDialog()}
       </div>
-      <div className="relative h-[calc(100svh-21rem)] min-h-[55svh] w-full overflow-hidden rounded-lg border border-muted-foreground/30 bg-background shadow-lg">
-        {previewEmbedLoaded ? (
-          <iframe
-            src={openLibraryService.formatReaderUrl(identifier)}
-            title={`Preview of ${book.title}`}
-            className="absolute inset-0 h-full w-full border-0"
-            allow="fullscreen"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-            <BookOpen className="size-8 text-muted-foreground" />
-            <p className="max-w-sm text-sm text-muted-foreground">
-              Click in the button below to load the interactive book preview.
-            </p>
-            <Button onClick={() => setPreviewEmbedLoaded(true)}>
-              Load interactive preview
-            </Button>
-          </div>
-        )}
-      </div>
-      {renderReturnDialog()}
     </article>
   );
 
