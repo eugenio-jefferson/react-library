@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import styles from "./Header.module.css";
 import ThemeSwitcher from "../ThemeSwitcher";
 import ProfileMenu from "../ProfileMenu";
+import NotificationBell from "../../notifications/NotificationBell";
 
 function Header() {
   return (
@@ -24,6 +25,7 @@ function Header() {
         </nav>
 
         <div className={styles.nav_actions}>
+          <NotificationBell />
           <ProfileMenu />
           <ThemeSwitcher />
         </div>
