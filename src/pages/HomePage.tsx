@@ -23,7 +23,7 @@ function Home() {
   };
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-8 bg-muted p-4 sm:p-6 md:p-10">
+    <article className="flex min-h-[calc(100svh-15rem)] flex-col items-center justify-start gap-8 bg-muted p-4 sm:p-6 md:p-10">
       <Card className="flex w-full max-w-4xl py-8 flex-col items-center gap-4 text-center md:py-10">
         <h1 className="text-2xl py-4 pr-6 pl-6 font-extrabold tracking-tight sm:text-3xl md:text-5xl">
           Discover Your Next Great Read

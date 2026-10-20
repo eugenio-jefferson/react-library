@@ -309,7 +309,7 @@ export default function BookPage() {
   };
 
   return (
-    <article className="min-h-[calc(100svh-4.3rem)] bg-muted">
+    <article className="min-h-[calc(100svh-15rem)] bg-muted">
       <div className="flex max-w-7xl m-auto w-full flex-col items-center justify-start gap-5 p-5 md:p-10">
         <header className="w-full">
           <Button

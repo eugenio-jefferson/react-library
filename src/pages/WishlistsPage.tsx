@@ -197,7 +197,7 @@ function WishlistsPage() {
   }
 
   return (
-    <article className="flex min-h-[calc(100svh-4.3rem)] flex-col items-center justify-start gap-5 bg-muted p-4 sm:p-5 md:p-10">
+    <article className="flex min-h-[calc(100svh-15rem)] flex-col items-center justify-start gap-5 bg-muted p-4 sm:p-5 md:p-10">
       <section className="flex w-full max-w-4xl flex-col gap-6">
         <Card className="flex w-full flex-col gap-3 border border-muted-foreground/30 p-5 shadow-lg">
           <CardHeader className="p-0">

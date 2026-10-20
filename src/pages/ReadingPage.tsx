@@ -33,7 +33,7 @@ function clampPage(value: number, total: number): number {
 
 function ReadingSkeleton() {
   return (
-    <article className="min-h-[calc(100svh-4.3rem)] bg-muted p-3 md:p-5">
+    <article className="min-h-[calc(100svh-15rem)] bg-muted p-3 md:p-5">
       <div className="flex max-w-7xl m-auto w-full flex-col gap-3 ">
         <header className="flex w-full flex-col gap-3 rounded-lg border border-muted-foreground/30 bg-background p-4 shadow-lg sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
@@ -425,7 +425,7 @@ export default function ReadingPage() {
   );
 
   const renderPreview = (identifier: string) => (
-    <article className="min-h-[calc(100svh-4.3rem)] bg-muted">
+    <article className="min-h-[calc(100svh-15rem)] bg-muted">
       <div className="flex max-w-7xl m-auto w-full flex-col gap-3 p-3 md:p-5">
         {renderHeader()}
         <div className="flex w-full flex-col items-start justify-between gap-3 rounded-lg border border-muted-foreground/30 bg-background p-3 shadow-lg sm:flex-row sm:items-center">
