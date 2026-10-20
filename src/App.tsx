@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import MyLoansPage from "./pages/MyLoansPage";
 import Register from "./pages/Register";
 import SearchPage from "./pages/SearchPage";
+import WishlistsPage from "./pages/WishlistsPage";
 
 function App() {
   return (
@@ -22,6 +23,14 @@ function App() {
           element={
             <RequireAuth>
               <MyLoansPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/wishlists"
+          element={
+            <RequireAuth>
+              <WishlistsPage />
             </RequireAuth>
           }
         />
